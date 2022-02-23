@@ -213,3 +213,141 @@ if options.only_task and options.old_model is not None:
     
 optimizer = optm.NoamOpt(options.d_model, options.factor, 4000,
         torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9))
+
+optimizer._step=options.step
+
+best_model_file_name = "{}/model.bin".format(root_dir)
+
+train_sampler = BucketSampler(batch_size=options.batch_size, seq_len_field_name='seq_len')
+dev_sampler = SequentialSampler()
+
+i2t=utils.to_id_list(tag_vocab.word2idx)   
+i2task=utils.to_id_list(task_vocab.word2idx)   
+dev_set.set_input("ori_words")
+test_set.set_input("ori_words")
+
+word_dic = pickle.load(open("dict.pkl","rb"))
+    
+def tester(model,test_batch,write_out=False):
+    res=[]
+    prf = utils.CWSEvaluator(i2t)
+    prf_dataset = {}
+    oov_dataset = {}
+
+    model.eval()
+    for batch_x, batch_y in test_batch:
+        with torch.no_grad():
+            if bigram_embedding is not None:
+                out=model(batch_x["task"],batch_x["uni"],batch_x["seq_len"],batch_x["bi1"],batch_x["bi2"])
+            else: out = model(batch_x["task"],batch_x["uni"],batch_x["seq_len"])
+        out=out["pred"]
+        #print(out)
+        num=out.size(0)
+        out=out.detach().cpu().numpy()
+        for i in range(num):
+            length=int(batch_x["seq_len"][i])
+            
+            out_tags=out[i,1:length].tolist()
+            sentence = batch_x["ori_words"][i]
+            gold_tags = batch_y["tags"][i][1:length].numpy().tolist()
+            dataset_name = sentence[0]
+            sentence=sentence[1:]
+            #print(out_tags,gold_tags)
+            assert utils.is_dataset_tag(dataset_name)
+            assert len(gold_tags)==len(out_tags) and len(gold_tags)==len(sentence)
+
+            if dataset_name not in prf_dataset:
+                prf_dataset[dataset_name] = utils.CWSEvaluator(i2t)
+                oov_dataset[dataset_name] = utils.CWS_OOV(word_dic[dataset_name[1:-1]])
+                    
+            prf_dataset[dataset_name].add_instance(gold_tags, out_tags)
+            prf.add_instance(gold_tags, out_tags)
+            
+            if write_out==True:
+                gold_strings = utils.to_tag_strings(i2t, gold_tags)
+                obs_strings = utils.to_tag_strings(i2t, out_tags)
+                          
+                word_list = utils.bmes_to_words(sentence, obs_strings)
+                oov_dataset[dataset_name].update(utils.bmes_to_words(sentence, gold_strings), word_list)
+                
+                raw_string=' '.join(word_list)
+                res.append(dataset_name+" "+raw_string+" "+dataset_name)
+    
+    Ap=0.0
+    Ar=0.0
+    Af=0.0
+    Aoov=0.0
+    tot=0
+    nw=0.0
+    for dataset_name, performance in sorted(prf_dataset.items()):
+        p = performance.result()
+        if write_out==True:
+            nw=oov_dataset[dataset_name].oov()
+            logger.info('{}\t{:04.2f}\t{:04.2f}\t{:04.2f}\t{:04.2f}'.format(dataset_name, p[0], p[1], p[2],nw))
+        else: logger.info('{}\t{:04.2f}\t{:04.2f}\t{:04.2f}'.format(dataset_name, p[0], p[1], p[2]))
+        Ap+=p[0]
+        Ar+=p[1]
+        Af+=p[2]
+        Aoov+=nw
+        tot+=1
+        
+    prf = prf.result()
+    logger.info('{}\t{:04.2f}\t{:04.2f}\t{:04.2f}'.format('TOT', prf[0], prf[1], prf[2]))
+    if write_out==False:
+        logger.info('{}\t{:04.2f}\t{:04.2f}\t{:04.2f}'.format('AVG', Ap/tot, Ar/tot, Af/tot))
+    else: logger.info('{}\t{:04.2f}\t{:04.2f}\t{:04.2f}\t{:04.2f}'.format('AVG', Ap/tot, Ar/tot, Af/tot,Aoov/tot))
+    return prf[-1], res
+           
+# start training        
+if not options.test:
+    if options.old_model:
+        # incremental training
+        print("Incremental training from old model: {}".format(options.old_model))
+        model.load_state_dict(torch.load(options.old_model,map_location="cuda:0"))
+              
+    logger.info("Number training instances: {}".format(len(train_set)))
+    logger.info("Number dev instances: {}".format(len(dev_set)))
+    
+    train_batch=DataSetIter(batch_size=options.batch_size, dataset=train_set, sampler=train_sampler)
+    dev_batch=DataSetIter(batch_size=options.batch_size, dataset=dev_set, sampler=dev_sampler)
+    
+    best_f1 = 0.
+    #bar = utils.Progbar(target=int(options.num_epochs))
+    for epoch in range(int(options.num_epochs)):
+        logger.info("Epoch {} out of {}".format(epoch + 1, options.num_epochs))
+        if epoch == options.flex:
+            logger.info("open pretrained embeddings")
+            model.module.src_embed.uni_embed.weight.requires_grad = True
+            if options.bigram_embeddings is not None:
+                model.module.src_embed.bi_embed.weight.requires_grad = True
+            optimizer.optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=optimizer.rate(), betas=(0.9, 0.98), eps=1e-9)
+        train_loss = 0.0
+        model.train()   
+        tot=0
+        t1=time.time()
+        #bar = utils.Progbar(target=len(train_set)//options.batch_size+1)
+        for batch_x, batch_y in train_batch:
+            model.zero_grad()
+            if bigram_embedding is not None:
+                out=model(batch_x["task"],batch_x["uni"],batch_x["seq_len"],batch_x["bi1"],batch_x["bi2"],batch_y["tags"])
+            else: out = model(batch_x["task"],batch_x["uni"],batch_x["seq_len"],tags=batch_y["tags"])
+            loss = torch.mean(out["loss"])
+            train_loss += loss.item() 
+            tot+=1
+            loss.backward()
+            optimizer.step()
+            #bar.update(tot, exact=[("train loss", train_loss)])
+
+        t2=time.time()    
+        train_loss = train_loss / tot
+        #bar.update(epoch, exact=[("train loss", train_loss)]) 
+        logger.info("time: {} loss: {} step: {}".format(t2-t1,train_loss,optimizer._step))
+        # Evaluate dev data
+        if options.skip_dev:
+            logger.info("Saving model to {}".format(best_model_file_name))
+            torch.save(model.state_dict(),best_model_file_name)
+            continue
+   
+        model.eval()
+        f1, _ =tester(model,dev_batch)
+        if f1 > best_f1:
