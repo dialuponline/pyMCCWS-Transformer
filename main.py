@@ -102,3 +102,114 @@ logger = init_logger()
 # ===-----------------------------------------------------------------------===
 logger.info(' '.join(sys.argv))
 logger.info('')
+logger.info(options)
+
+if options.debug:
+    print("DEBUG MODE")
+    options.num_epochs = 2
+    options.batch_size=20
+
+random.seed(options.python_seed)
+np.random.seed(options.python_seed % (2 ** 32 - 1))
+logger.info('Python random seed: {}'.format(options.python_seed))
+
+# ===-----------------------------------------------------------------------===
+# Read in dataset
+# ===-----------------------------------------------------------------------===
+dataset = pickle.load(open(options.dataset, "rb"))
+train_set=dataset["train_set"]
+test_set=dataset["test_set"]
+uni_vocab=dataset["uni_vocab"]
+bi_vocab=dataset["bi_vocab"]
+task_vocab=dataset["task_vocab"]
+tag_vocab=dataset["tag_vocab"]
+print(bi_vocab.to_word(0),tag_vocab.word2idx)
+print(task_vocab.word2idx)
+if options.skip_dev:
+    dev_set=test_set
+else:
+    train_set, dev_set=train_set.split(0.1)
+    
+print(len(train_set),len(dev_set),len(test_set))
+
+if options.debug:
+    train_set = train_set[0:DEBUG_SCALE]
+    dev_set = dev_set[0:DEBUG_SCALE]
+    test_set = test_set[0:DEBUG_SCALE]
+
+# ===-----------------------------------------------------------------------===
+# Build model and trainer
+# ===-----------------------------------------------------------------------===
+
+if options.word_embeddings is None:
+    init_embedding=None
+else:
+    print("Load:",options.word_embeddings)
+    init_embedding=fastNLP.io.embed_loader.EmbedLoader.load_with_vocab(options.word_embeddings, uni_vocab, normalize=False)
+    
+bigram_embedding = None
+if options.bigram_embeddings:
+    if options.bigram_embeddings == 'merged':
+        logging.info('calculate bigram embeddings from unigram embeddings')
+        bigram_embedding=np.random.randn(len(bi_vocab), init_embedding.shape[-1]).astype('float32')      
+        for token, i in bi_vocab:
+            if token.startswith('<') and token.endswith('>'): continue
+            if token.endswith('>'):
+                x,y=uni_vocab[token[0]], uni_vocab[token[1:]]
+            else: 
+                x,y=uni_vocab[token[:-1]], uni_vocab[token[-1]]
+            if x==uni_vocab['<unk>']:
+                x=uni_vocab['<pad>']
+            if y==uni_vocab['<unk>']:
+                y=uni_vocab['<pad>']
+            bigram_embedding[i]=(init_embedding[x]+init_embedding[y])/2
+    else:    
+        print("Load:",options.bigram_embeddings)
+        bigram_embedding=fastNLP.io.embed_loader.EmbedLoader.load_with_vocab(options.bigram_embeddings, bi_vocab, normalize=False)
+
+#select subset training
+if options.seclude is not None:
+    setname="<{}>".format(options.seclude)
+    print("seclude",setname)
+    train_set.drop(lambda x: x["ori_words"][0]==setname,inplace=True)
+    test_set.drop(lambda x: x["ori_words"][0]==setname,inplace=True)
+    dev_set.drop(lambda x: x["ori_words"][0]==setname,inplace=True)
+
+if options.subset is not None:
+    setname="<{}>".format(options.subset)
+    print("select",setname)
+    train_set.drop(lambda x: x["ori_words"][0]!=setname,inplace=True)
+    test_set.drop(lambda x: x["ori_words"][0]!=setname,inplace=True)
+    dev_set.drop(lambda x: x["ori_words"][0]!=setname,inplace=True)
+    if options.instances is not None:
+        train_set=train_set[:int(options.instances)]
+        
+# build model and optimizer    
+i2t=None
+if options.crf:
+    #i2t=utils.to_id_list(tag_vocab.word2idx)   
+    i2t={}
+    for x,y in tag_vocab.word2idx.items():
+        i2t[y]=x
+    print("use crf:",i2t)
+
+freeze=True if options.freeze else False
+model = models.make_CWS(d_model=options.d_model, N=options.N, h=options.h, d_ff=options.d_ff,dropout=options.dropout,word_embedding=init_embedding,bigram_embedding=bigram_embedding,tag_size=len(tag_vocab),task_size=len(task_vocab),crf=i2t,freeze=freeze)
+
+if True:  
+    print("multi:",devices)
+    model=nn.DataParallel(model,device_ids=devices)    
+
+model=model.to(device)
+
+if options.only_task and options.old_model is not None:
+    print("fix para except task embedding")
+    for name,para in model.named_parameters():
+        if name.find("task_embed")==-1:
+            para.requires_grad=False
+        else:
+            para.requires_grad=True
+            print(name)
+    
+optimizer = optm.NoamOpt(options.d_model, options.factor, 4000,
+        torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9))
