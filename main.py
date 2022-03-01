@@ -351,3 +351,40 @@ if not options.test:
         model.eval()
         f1, _ =tester(model,dev_batch)
         if f1 > best_f1:
+            best_f1 = f1
+            logger.info("- new best score!")
+            # Serialize model
+            if not options.no_model:
+                logger.info("Saving model to {}".format(best_model_file_name))
+                torch.save(model.state_dict(),best_model_file_name)
+                
+        elif options.always_model:
+            logger.info("Saving model to {}".format(best_model_file_name))
+            torch.save(model.state_dict(),best_model_file_name)
+                
+# Evaluate test data (once)
+logger.info("\n")
+logger.info("Number test instances: {}".format(len(test_set)))
+
+if not options.skip_dev:
+    if options.test:
+        model.load_state_dict(torch.load(options.old_model,map_location="cuda:0"))
+    else:
+        model.load_state_dict(torch.load(best_model_file_name,map_location="cuda:0"))
+        
+for name,para in model.named_parameters():
+    if name.find("task_embed")!=-1:
+        tm=para.detach().cpu().numpy()
+        print(tm.shape)
+        np.save("{}/task.npy".format(root_dir),tm)                    
+        break
+        
+test_batch=DataSetIter(test_set,options.batch_size)
+_, res=tester(model,test_batch,False)
+exit()
+
+with open("{}/testout.txt".format(root_dir), 'w',encoding="utf-16") as raw_writer:
+    for sent in res:
+        raw_writer.write(sent)
+        raw_writer.write('\n')
+        
