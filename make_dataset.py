@@ -12,4 +12,7 @@ def expand(x):
     sent=["<sos>"]+x[1:]+["<eos>"]
     return [x+y for x,y in zip(sent[:-1],sent[1:])]
     
-def read
+def read_file(filename, processing_word=get_processing_word(lowercase=False)):
+    dataset = DataSet()
+    niter=0
+    with cod
