@@ -21,4 +21,8 @@ def read_file(filename, processing_word=get_processing_word(lowercase=False)):
             line = line.strip()
             if len(line) == 0 or line.startswith("-DOCSTART-"):
                 if len(words) != 0:
-                   
+                    assert len(words)>2
+                    if niter==1:
+                        print(words,tags)
+                    niter += 1
+       
