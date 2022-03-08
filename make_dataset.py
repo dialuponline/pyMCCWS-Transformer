@@ -15,4 +15,8 @@ def expand(x):
 def read_file(filename, processing_word=get_processing_word(lowercase=False)):
     dataset = DataSet()
     niter=0
-    with cod
+    with codecs.open(filename, "r", "utf-16") as f:
+        words, tags = [], []
+        for line in f:
+            line = line.strip()
+       
