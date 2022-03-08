@@ -19,4 +19,6 @@ def read_file(filename, processing_word=get_processing_word(lowercase=False)):
         words, tags = [], []
         for line in f:
             line = line.strip()
-       
+            if len(line) == 0 or line.startswith("-DOCSTART-"):
+                if len(words) != 0:
+                   
