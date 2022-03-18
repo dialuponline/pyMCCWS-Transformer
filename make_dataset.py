@@ -27,4 +27,7 @@ def read_file(filename, processing_word=get_processing_word(lowercase=False)):
                     niter += 1
                     dataset.append(Instance(ori_words=words[:-1], ori_tags=tags[:-1]))
                     words, tags = [], []
-        
+            else:
+                word, tag = line.split()
+                word = processing_word(word)
+                words.append(w
