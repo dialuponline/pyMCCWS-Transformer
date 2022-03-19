@@ -30,4 +30,7 @@ def read_file(filename, processing_word=get_processing_word(lowercase=False)):
             else:
                 word, tag = line.split()
                 word = processing_word(word)
-                words.append(w
+                words.append(word)
+                tags.append(tag.lower())
+                
+    dataset.apply_field(lambda x: [x[0]], field_name='o
