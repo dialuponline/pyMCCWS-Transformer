@@ -34,4 +34,6 @@ def read_file(filename, processing_word=get_processing_word(lowercase=False)):
                 tags.append(tag.lower())
                 
     dataset.apply_field(lambda x: [x[0]], field_name='ori_words', new_field_name='task')   
-    dataset.apply_field(lambda x: len(x), field_name='ori_tags', new_field_name
+    dataset.apply_field(lambda x: len(x), field_name='ori_tags', new_field_name='seq_len')   
+    dataset.apply_field(lambda x: expand(x), field_name='ori_words', new_field_name="bi1")
+   
