@@ -41,4 +41,5 @@ def read_file(filename, processing_word=get_processing_word(lowercase=False)):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--training-data", required=True, dest="training_data", help="Training data .txt file")
-parser.add_argument("--test-data", required=True, dest="te
+parser.add_argument("--test-data", required=True, dest="test_data", help="Test data .txt file")
+parser.add_argument("-o", required=True, dest="output", help="Output filenam
