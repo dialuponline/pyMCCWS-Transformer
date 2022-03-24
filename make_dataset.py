@@ -48,4 +48,7 @@ options = parser.parse_args()
 
 print('Making training dataset')
 train_set = read_file(options.training_data)
-print('
+print('Making test dataset')
+test_set = read_file(options.test_data)
+
+uni_vocab = Vocabulary(min_freq=None).from_dataset(
