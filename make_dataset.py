@@ -51,4 +51,5 @@ train_set = read_file(options.training_data)
 print('Making test dataset')
 test_set = read_file(options.test_data)
 
-uni_vocab = Vocabulary(min_freq=None).from_dataset(
+uni_vocab = Vocabulary(min_freq=None).from_dataset(train_set,test_set, field_name='ori_words')
+bi_vocab = Vocabulary(min_freq=3).from_dataset(train_set,test_set, field_n
