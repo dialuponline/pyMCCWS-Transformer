@@ -54,4 +54,8 @@ test_set = read_file(options.test_data)
 uni_vocab = Vocabulary(min_freq=None).from_dataset(train_set,test_set, field_name='ori_words')
 bi_vocab = Vocabulary(min_freq=3).from_dataset(train_set,test_set, field_name="bi1")
 tag_vocab = Vocabulary(min_freq=None, padding="s", unknown=None).from_dataset(train_set, field_name='ori_tags')
-task_vocab = Vocabulary(min_freq=None,padding=None, unknown=None).from_dataset(train_set, field_name
+task_vocab = Vocabulary(min_freq=None,padding=None, unknown=None).from_dataset(train_set, field_name='task')
+
+def to_index(dataset):
+    uni_vocab.index_dataset(dataset, field_name='ori_words',new_field_name='uni')
+    tag_vocab.index_datas
