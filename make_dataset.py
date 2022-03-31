@@ -58,4 +58,5 @@ task_vocab = Vocabulary(min_freq=None,padding=None, unknown=None).from_dataset(t
 
 def to_index(dataset):
     uni_vocab.index_dataset(dataset, field_name='ori_words',new_field_name='uni')
-    tag_vocab.index_datas
+    tag_vocab.index_dataset(dataset, field_name='ori_tags',new_field_name='tags')
+    task_vocab.index_dataset(dataset, field_name='task',ne
