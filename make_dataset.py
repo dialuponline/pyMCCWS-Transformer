@@ -70,4 +70,9 @@ def to_index(dataset):
     dataset.set_target("tags")
     return dataset
     
-train_set = to_index(train_s
+train_set = to_index(train_set)      
+test_set = to_index(test_set)
+
+output={}
+output["train_set"]=train_set
+output["test_set"]=te
