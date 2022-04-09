@@ -66,4 +66,8 @@ def to_index(dataset):
     bi_vocab.index_dataset(dataset, field_name='bi1',new_field_name='bi1')
     bi_vocab.index_dataset(dataset, field_name='bi2',new_field_name='bi2')
     
-    datas
+    dataset.set_input("task","uni","bi1","bi2","seq_len")
+    dataset.set_target("tags")
+    return dataset
+    
+train_set = to_index(train_s
