@@ -83,4 +83,8 @@ output["task_vocab"]=task_vocab
 
 make_sure_path_exists(os.path.dirname(options.output))
 
-print('Saving dataset to {}'.format(options.ou
+print('Saving dataset to {}'.format(options.output))
+with open(options.output, "wb") as outfile:
+    pickle.dump(output, outfile)
+
+print(len(task_vocab),len(t
