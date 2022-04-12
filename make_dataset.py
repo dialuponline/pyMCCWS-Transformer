@@ -75,4 +75,8 @@ test_set = to_index(test_set)
 
 output={}
 output["train_set"]=train_set
-output["test_set"]=te
+output["test_set"]=test_set
+output["uni_vocab"]=uni_vocab
+output["bi_vocab"]=bi_vocab
+output["tag_vocab"]=tag_vocab
+output["task_vocab"]=task_vocab
