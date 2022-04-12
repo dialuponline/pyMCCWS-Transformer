@@ -80,3 +80,7 @@ output["uni_vocab"]=uni_vocab
 output["bi_vocab"]=bi_vocab
 output["tag_vocab"]=tag_vocab
 output["task_vocab"]=task_vocab
+
+make_sure_path_exists(os.path.dirname(options.output))
+
+print('Saving dataset to {}'.format(options.ou
