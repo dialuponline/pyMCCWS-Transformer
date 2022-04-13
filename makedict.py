@@ -12,4 +12,8 @@ tokens={}
 with open(path, "r", encoding="utf-16") as f:
     for line in f.readlines():
         cur=line.strip().split(" ")
-        name=cur[0]
+        name=cur[0][1:-1]
+        if dic.get(name) is None:
+            dic[name]=set()
+            tokens[name]=0
+        tokens[name]+=len(cu
