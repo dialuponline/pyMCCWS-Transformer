@@ -87,4 +87,4 @@ print('Saving dataset to {}'.format(options.output))
 with open(options.output, "wb") as outfile:
     pickle.dump(output, outfile)
 
-print(len(task_vocab),len(t
+print(len(task_vocab),len(tag_vocab),len(uni_vocab),len(bi_vocab))
