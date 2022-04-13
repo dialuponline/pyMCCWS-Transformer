@@ -9,4 +9,7 @@ out_path="dict.pkl"
 
 dic={}
 tokens={}
-with open(path, "r", e
+with open(path, "r", encoding="utf-16") as f:
+    for line in f.readlines():
+        cur=line.strip().split(" ")
+        name=cur[0]
