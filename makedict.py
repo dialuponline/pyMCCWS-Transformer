@@ -16,4 +16,9 @@ with open(path, "r", encoding="utf-16") as f:
         if dic.get(name) is None:
             dic[name]=set()
             tokens[name]=0
-        tokens[name]+=len(cu
+        tokens[name]+=len(cur[1:-1])
+        dic[name].update(cur[1:-1])
+
+for i in list(dic.keys()):
+    print(i,len(dic[i]),tokens[i])
+with open(out_path,"wb") as ou
