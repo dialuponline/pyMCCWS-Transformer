@@ -21,4 +21,5 @@ with open(path, "r", encoding="utf-16") as f:
 
 for i in list(dic.keys()):
     print(i,len(dic[i]),tokens[i])
-with open(out_path,"wb") as ou
+with open(out_path,"wb") as outfile:
+    pickle.dump(dic,outfile)
