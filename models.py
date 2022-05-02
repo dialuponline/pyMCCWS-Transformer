@@ -8,4 +8,12 @@ import copy
 import numpy as np
 from torch.autograd import Variable
 import torch.autograd as autograd
-i
+import torch.nn as nn
+import torch.nn.functional as F
+import transformer
+
+class PositionalEncoding(nn.Module):
+    "Implement the PE function."
+    def __init__(self, d_model, dropout, max_len=5000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout
