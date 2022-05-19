@@ -31,4 +31,7 @@ class PositionalEncoding(nn.Module):
     def forward(self, x):
         x = x + Variable(self.pe[:, :x.size(1)], 
                          requires_grad=False)
-  
+        return self.dropout(x)
+
+class Embedding(nn.Module):
+    def __init__(self,task_size, d_model, word_embedding=None, bi_emb
