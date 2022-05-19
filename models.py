@@ -37,4 +37,9 @@ class Embedding(nn.Module):
     def __init__(self,task_size, d_model, word_embedding=None, bi_embedding=None, word_size=None, freeze=True):
         super(Embedding, self).__init__()
         self.task_size=task_size        
-        s
+        self.embed_dim = 0        
+        
+        self.task_embed = nn.Embedding(task_size,d_model)
+        """
+        if freeze:
+         
