@@ -42,4 +42,7 @@ class Embedding(nn.Module):
         self.task_embed = nn.Embedding(task_size,d_model)
         """
         if freeze:
-         
+            self.task_embed.weight.requires_grad = False
+        """
+        if word_embedding is not None:
+            self.uni_embed =
