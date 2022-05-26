@@ -45,4 +45,5 @@ class Embedding(nn.Module):
             self.task_embed.weight.requires_grad = False
         """
         if word_embedding is not None:
-            self.uni_embed =
+            self.uni_embed = nn.Embedding.from_pretrained(torch.FloatTensor(word_embedding), freeze=freeze)
+            self.embed_dim+=word_embedding.shap
