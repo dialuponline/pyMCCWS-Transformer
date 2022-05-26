@@ -52,4 +52,7 @@ class Embedding(nn.Module):
                 self.embed_dim+=bi_embedding.shape[1]
             else: self.embed_dim=d_model
             assert word_size is not None
-            self.uni_embed = nn.Embedding(word_size,self
+            self.uni_embed = nn.Embedding(word_size,self.embed_dim)
+            
+        if bi_embedding is not None:    
+            self.bi_embed = nn.Embedding.f
