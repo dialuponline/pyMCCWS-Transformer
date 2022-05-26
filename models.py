@@ -46,4 +46,8 @@ class Embedding(nn.Module):
         """
         if word_embedding is not None:
             self.uni_embed = nn.Embedding.from_pretrained(torch.FloatTensor(word_embedding), freeze=freeze)
-            self.embed_dim+=word_embedding.shap
+            self.embed_dim+=word_embedding.shape[1]
+        else:
+            if bigram_embedding is not None:
+                self.embed_dim+=bi_embedding.shape[1]
+            
