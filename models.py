@@ -57,4 +57,8 @@ class Embedding(nn.Module):
         if bi_embedding is not None:    
             self.bi_embed = nn.Embedding.from_pretrained(torch.FloatTensor(bi_embedding), freeze=freeze)
             self.embed_dim += bi_embedding.shape[1]*2
-         
+            
+        print("Trans Freeze",freeze,self.embed_dim)
+        
+        if d_model!=self.embed_dim:
+            self.F=nn.Linear(s
