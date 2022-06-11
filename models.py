@@ -69,3 +69,8 @@ class Embedding(nn.Module):
 
     def forward(self, task, uni, bi1=None, bi2=None):
         #print(task,uni.size(),bi1.size(),bi2.size())
+        #print(bi1,bi2)
+        #assert False
+        y_task=self.task_embed(task[:,0:1])
+        y=self.uni_embed(uni[:,1:])
+  
