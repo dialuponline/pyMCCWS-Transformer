@@ -67,4 +67,5 @@ class Embedding(nn.Module):
             
         self.d_model = d_model
 
-   
+    def forward(self, task, uni, bi1=None, bi2=None):
+        #print(task,uni.size(),bi1.size(),bi2.size())
