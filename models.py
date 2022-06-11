@@ -61,4 +61,10 @@ class Embedding(nn.Module):
         print("Trans Freeze",freeze,self.embed_dim)
         
         if d_model!=self.embed_dim:
-            self.F=nn.Linear(s
+            self.F=nn.Linear(self.embed_dim,d_model)
+        else :
+            self.F=None
+            
+        self.d_model = d_model
+
+   
