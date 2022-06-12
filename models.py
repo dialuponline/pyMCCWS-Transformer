@@ -76,4 +76,6 @@ class Embedding(nn.Module):
         if bi1 is not None:
             assert self.bi_embed is not None
             
-            y=torch.cat([y,self.bi_embed
+            y=torch.cat([y,self.bi_embed(bi1),self.bi_embed(bi2)],dim=-1)
+            #y2=self.bi_embed(bi)
+            #y=torch.cat([y,y2[:,:-1,:],y2[:,1:,:]],dim=-
