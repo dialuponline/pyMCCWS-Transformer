@@ -73,4 +73,7 @@ class Embedding(nn.Module):
         #assert False
         y_task=self.task_embed(task[:,0:1])
         y=self.uni_embed(uni[:,1:])
-  
+        if bi1 is not None:
+            assert self.bi_embed is not None
+            
+            y=torch.cat([y,self.bi_embed
