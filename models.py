@@ -78,4 +78,9 @@ class Embedding(nn.Module):
             
             y=torch.cat([y,self.bi_embed(bi1),self.bi_embed(bi2)],dim=-1)
             #y2=self.bi_embed(bi)
-            #y=torch.cat([y,y2[:,:-1,:],y2[:,1:,:]],dim=-
+            #y=torch.cat([y,y2[:,:-1,:],y2[:,1:,:]],dim=-1)
+            
+        #y=torch.cat([y_task,y],dim=1)
+        if self.F is not None:
+            y=self.F(y)
+        y=tor
