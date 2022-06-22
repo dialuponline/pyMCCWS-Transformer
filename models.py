@@ -83,4 +83,7 @@ class Embedding(nn.Module):
         #y=torch.cat([y_task,y],dim=1)
         if self.F is not None:
             y=self.F(y)
-        y=tor
+        y=torch.cat([y_task,y],dim=1)
+        return y * math.sqrt(self.d_model)
+
+def seq_len_to_mask(seq_len,max_len=N
