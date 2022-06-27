@@ -86,4 +86,6 @@ class Embedding(nn.Module):
         y=torch.cat([y_task,y],dim=1)
         return y * math.sqrt(self.d_model)
 
-def seq_len_to_mask(seq_len,max_len=N
+def seq_len_to_mask(seq_len,max_len=None):
+    if isinstance(seq_len, np.ndarray):
+        assert len(np.shape(seq_len)) == 1, f"seq_len can only have one dimens
