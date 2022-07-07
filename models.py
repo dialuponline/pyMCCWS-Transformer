@@ -94,4 +94,6 @@ def seq_len_to_mask(seq_len,max_len=None):
         broad_cast_seq_len = np.tile(np.arange(max_len), (len(seq_len), 1))
         mask = broad_cast_seq_len < seq_len.reshape(-1, 1)
     
-    elif isinstance(seq_len, t
+    elif isinstance(seq_len, torch.Tensor):
+        assert seq_len.dim() == 1, f"seq_len can only have one dimension, got {seq_len.dim() == 1}."
+        bat
