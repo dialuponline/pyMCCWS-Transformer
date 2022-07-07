@@ -88,4 +88,7 @@ class Embedding(nn.Module):
 
 def seq_len_to_mask(seq_len,max_len=None):
     if isinstance(seq_len, np.ndarray):
-        assert len(np.shape(seq_len)) == 1, f"seq_len can only have one dimens
+        assert len(np.shape(seq_len)) == 1, f"seq_len can only have one dimension, got {len(np.shape(seq_len))}."
+        if max_len is None:
+            max_len = int(seq_len.max())
+        broad_cast_seq_len = np.tile(np.a
