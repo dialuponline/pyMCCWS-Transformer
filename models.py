@@ -91,4 +91,7 @@ def seq_len_to_mask(seq_len,max_len=None):
         assert len(np.shape(seq_len)) == 1, f"seq_len can only have one dimension, got {len(np.shape(seq_len))}."
         if max_len is None:
             max_len = int(seq_len.max())
-        broad_cast_seq_len = np.tile(np.a
+        broad_cast_seq_len = np.tile(np.arange(max_len), (len(seq_len), 1))
+        mask = broad_cast_seq_len < seq_len.reshape(-1, 1)
+    
+    elif isinstance(seq_len, t
