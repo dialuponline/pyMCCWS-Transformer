@@ -99,4 +99,7 @@ def seq_len_to_mask(seq_len,max_len=None):
         batch_size = seq_len.size(0)
         if max_len is None:
             max_len = seq_len.max().long()
-        broad_cast_seq_len = torch.arange(max_l
+        broad_cast_seq_len = torch.arange(max_len).expand(batch_size, -1).to(seq_len)
+        mask = broad_cast_seq_len.lt(seq_len.unsqueeze(1))
+    else:
+        raise TypeError("Only sup
