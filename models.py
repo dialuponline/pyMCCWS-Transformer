@@ -102,4 +102,9 @@ def seq_len_to_mask(seq_len,max_len=None):
         broad_cast_seq_len = torch.arange(max_len).expand(batch_size, -1).to(seq_len)
         mask = broad_cast_seq_len.lt(seq_len.unsqueeze(1))
     else:
-        raise TypeError("Only sup
+        raise TypeError("Only support 1-d numpy.ndarray or 1-d torch.Tensor.")
+    
+    return mask        
+    
+class CWSModel(nn.Module):
+    def __init__(sel
