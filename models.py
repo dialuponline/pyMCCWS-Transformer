@@ -107,4 +107,6 @@ def seq_len_to_mask(seq_len,max_len=None):
     return mask        
     
 class CWSModel(nn.Module):
-    def __init__(sel
+    def __init__(self, encoder, src_embed, position, d_model, tag_size, crf=None):
+        super(CWSModel, self).__init__()
+        self.encoder = en
