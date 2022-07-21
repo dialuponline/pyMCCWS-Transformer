@@ -109,4 +109,7 @@ def seq_len_to_mask(seq_len,max_len=None):
 class CWSModel(nn.Module):
     def __init__(self, encoder, src_embed, position, d_model, tag_size, crf=None):
         super(CWSModel, self).__init__()
-        self.encoder = en
+        self.encoder = encoder
+        self.src_embed = src_embed
+        self.pos=copy.deepcopy(position)
+        self.proj = nn.Linear(d_m
