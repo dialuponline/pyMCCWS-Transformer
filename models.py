@@ -112,4 +112,8 @@ class CWSModel(nn.Module):
         self.encoder = encoder
         self.src_embed = src_embed
         self.pos=copy.deepcopy(position)
-        self.proj = nn.Linear(d_m
+        self.proj = nn.Linear(d_model, tag_size)
+        self.tag_size=tag_size
+        if crf is None:
+            self.crf=None
+            s
