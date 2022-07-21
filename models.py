@@ -116,4 +116,7 @@ class CWSModel(nn.Module):
         self.tag_size=tag_size
         if crf is None:
             self.crf=None
-            s
+            self.loss_f=nn.CrossEntropyLoss(size_average=False)
+        else:
+            print("crf")
+            trans=fastNLP.modules.d
