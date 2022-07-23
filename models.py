@@ -119,4 +119,5 @@ class CWSModel(nn.Module):
             self.loss_f=nn.CrossEntropyLoss(size_average=False)
         else:
             print("crf")
-            trans=fastNLP.modules.d
+            trans=fastNLP.modules.decoder.crf.allowed_transitions(crf,encoding_type='bmes')
+            self.crf=ConditionalRandomField(tag_size,allowed_transitions=
