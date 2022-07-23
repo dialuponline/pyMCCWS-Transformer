@@ -120,4 +120,7 @@ class CWSModel(nn.Module):
         else:
             print("crf")
             trans=fastNLP.modules.decoder.crf.allowed_transitions(crf,encoding_type='bmes')
-            self.crf=ConditionalRandomField(tag_size,allowed_transitions=
+            self.crf=ConditionalRandomField(tag_size,allowed_transitions=trans)
+        #self.norm=nn.LayerNorm(d_model)
+
+    def forward(self, task, uni, seq_len, bi1=None, bi2=None, tags=
