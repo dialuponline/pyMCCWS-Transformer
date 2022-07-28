@@ -126,4 +126,7 @@ class CWSModel(nn.Module):
     def forward(self, task, uni, seq_len, bi1=None, bi2=None, tags=None):        
         #mask=fastNLP.core.utils.seq_len_to_mask(seq_len)
         mask=seq_len_to_mask(seq_len,uni.size(1))
- 
+        out=self.src_embed(task,uni,bi1,bi2)
+        out=self.pos(out)
+        #out=self.norm(out)
+        #print(u
