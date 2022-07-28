@@ -132,4 +132,7 @@ class CWSModel(nn.Module):
         #print(uni.size(),out.size(),mask.size(),seq_len)
         out=self.proj(self.encoder(out, mask.float()))
         
-  
+        if self.crf is not None:
+            if tags is not None:
+                out=self.crf(out, tags, mask)
+      
