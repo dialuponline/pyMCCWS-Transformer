@@ -129,4 +129,7 @@ class CWSModel(nn.Module):
         out=self.src_embed(task,uni,bi1,bi2)
         out=self.pos(out)
         #out=self.norm(out)
-        #print(u
+        #print(uni.size(),out.size(),mask.size(),seq_len)
+        out=self.proj(self.encoder(out, mask.float()))
+        
+  
