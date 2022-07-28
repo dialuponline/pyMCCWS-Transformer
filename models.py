@@ -123,4 +123,7 @@ class CWSModel(nn.Module):
             self.crf=ConditionalRandomField(tag_size,allowed_transitions=trans)
         #self.norm=nn.LayerNorm(d_model)
 
-    def forward(self, task, uni, seq_len, bi1=None, bi2=None, tags=
+    def forward(self, task, uni, seq_len, bi1=None, bi2=None, tags=None):        
+        #mask=fastNLP.core.utils.seq_len_to_mask(seq_len)
+        mask=seq_len_to_mask(seq_len,uni.size(1))
+ 
