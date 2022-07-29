@@ -138,4 +138,8 @@ class CWSModel(nn.Module):
                 return {"loss":out}
             else: 
                 out,_ =self.crf.viterbi_decode(out, mask)
-                return {"pred":
+                return {"pred":out}
+        else:
+            if tags is not None:
+                num=out.size(0)
+                loss = self.loss_f(tor
