@@ -135,4 +135,7 @@ class CWSModel(nn.Module):
         if self.crf is not None:
             if tags is not None:
                 out=self.crf(out, tags, mask)
-      
+                return {"loss":out}
+            else: 
+                out,_ =self.crf.viterbi_decode(out, mask)
+                return {"pred":
