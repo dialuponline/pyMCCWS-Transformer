@@ -150,4 +150,5 @@ class CWSModel(nn.Module):
    
                 
 def make_CWS(N=6, d_model=256, d_ff=1024, h=4, dropout=0.2, tag_size=4, task_size=8, bigram_embedding=None, word_embedding=None, word_size=None, crf=None,freeze=True):
-    c = copy.dee
+    c = copy.deepcopy
+    #encoder=TransformerEncoder(num_layers=N,model_size=d_model,inner_size=d_ff,key_size=d_model//h,value_size=d_mode
