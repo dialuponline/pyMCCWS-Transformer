@@ -142,4 +142,8 @@ class CWSModel(nn.Module):
         else:
             if tags is not None:
                 num=out.size(0)
-                loss = self.loss_f(torch.masked_select(out,mask.unsqueeze(-1).expand_as(out)).contiguous().view(-1,self.tag_size), torch.masked_select(ta
+                loss = self.loss_f(torch.masked_select(out,mask.unsqueeze(-1).expand_as(out)).contiguous().view(-1,self.tag_size), torch.masked_select(tags,mask))
+                return {"loss":loss/num}
+            else:
+                out=torch.argmax(out,dim=-1)  
+        
