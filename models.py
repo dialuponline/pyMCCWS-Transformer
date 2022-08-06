@@ -149,4 +149,5 @@ class CWSModel(nn.Module):
                 return {"pred":out}
    
                 
-def make_CWS(N=6, d_model=256, d_ff=1024, h=4, dropout=0.2, tag
+def make_CWS(N=6, d_model=256, d_ff=1024, h=4, dropout=0.2, tag_size=4, task_size=8, bigram_embedding=None, word_embedding=None, word_size=None, crf=None,freeze=True):
+    c = copy.dee
