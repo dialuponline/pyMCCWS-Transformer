@@ -146,4 +146,7 @@ class CWSModel(nn.Module):
                 return {"loss":loss/num}
             else:
                 out=torch.argmax(out,dim=-1)  
-        
+                return {"pred":out}
+   
+                
+def make_CWS(N=6, d_model=256, d_ff=1024, h=4, dropout=0.2, tag
