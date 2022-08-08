@@ -154,3 +154,5 @@ def make_CWS(N=6, d_model=256, d_ff=1024, h=4, dropout=0.2, tag_size=4, task_siz
     #encoder=TransformerEncoder(num_layers=N,model_size=d_model,inner_size=d_ff,key_size=d_model//h,value_size=d_model//h,num_head=h,dropout=dropout)
     encoder=transformer.make_encoder(N=N,d_model=d_model,h=h,dropout=dropout,d_ff=d_ff)
     
+    position = PositionalEncoding(d_model, dropout)
+    embed=Embedding(task_size, d_model, word_embeddin
