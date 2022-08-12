@@ -161,4 +161,4 @@ def make_CWS(N=6, d_model=256, d_ff=1024, h=4, dropout=0.2, tag_size=4, task_siz
     for name,p in model.named_parameters():
         if p.dim() > 1 and p.requires_grad==True:
             nn.init.xavier_uniform(p)
-    re
+    return model
