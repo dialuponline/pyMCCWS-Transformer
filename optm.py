@@ -11,4 +11,8 @@ class NoamOpt:
         self.model_size = model_size
         self._rate = 0
         
-  
+    def step(self):
+        "Update parameters and rate"
+        self._step += 1
+        rate = self.rate()
+        for p in se
