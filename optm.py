@@ -7,3 +7,8 @@ class NoamOpt:
         self.optimizer = optimizer
         self._step = 0
         self.warmup = warmup
+        self.factor = factor
+        self.model_size = model_size
+        self._rate = 0
+        
+  
