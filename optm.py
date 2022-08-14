@@ -20,4 +20,9 @@ class NoamOpt:
         self._rate = rate
         self.optimizer.step()
         
-    def rate(self, step 
+    def rate(self, step = None):
+        "Implement `lrate` above"
+        if step is None:
+            step = self._step
+        lr = self.factor * \
+           
