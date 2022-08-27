@@ -27,4 +27,9 @@ class NoamOpt:
         lr = self.factor * \
             (self.model_size ** (-0.5) *
             min(step ** (-0.5), step * self.warmup ** (-1.5)))
-        #if step>se
+        #if step>self.warmup: lr = max(1e-4,lr)
+        return lr
+
+def get_std_opt(model):
+    return NoamOpt(model.src_embed[0].d_model, 2, 4000,
+            t
