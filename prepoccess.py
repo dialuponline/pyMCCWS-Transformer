@@ -129,3 +129,102 @@ def convert_sighan2008_dataset(dataset, utf=16):
 
 def convert_sxu():
     dataset = 'sxu'
+    print('Converting corpus {}'.format(dataset))
+    root = 'data/' + dataset
+    make_sure_path_exists(root)
+    make_sure_path_exists(root + '/raw')
+    convert_file('data/other/{}/train.txt'.format(dataset), 'data/{}/raw/train-all.txt'.format(dataset), True)
+    convert_file('data/other/{}/test.txt'.format(dataset), 'data/{}/raw/test.txt'.format(dataset), False)
+    split_train_dev(dataset)
+    make_bmes(dataset)
+
+
+def convert_ctb():
+    dataset = 'ctb'
+    print('Converting corpus {}'.format(dataset))
+    root = 'data/' + dataset
+    make_sure_path_exists(root)
+    make_sure_path_exists(root + '/raw')
+    convert_file('data/other/ctb/ctb6.train.seg', 'data/{}/raw/train.txt'.format(dataset), True)
+    convert_file('data/other/ctb/ctb6.dev.seg', 'data/{}/raw/dev.txt'.format(dataset), True)
+    convert_file('data/other/ctb/ctb6.test.seg', 'data/{}/raw/test.txt'.format(dataset), False)
+    combine_files('data/{}/raw/train.txt'.format(dataset), 'data/{}/raw/dev.txt'.format(dataset),
+                  'data/{}/raw/train-all.txt'.format(dataset))
+    make_bmes(dataset)
+
+
+def remove_pos(src, out, delimiter='/'):
+    # print(src)
+    with open(src) as src, open(out, 'w') as out:
+        for line in src:
+            words = []
+            for word_pos in line.split(' '):
+                # if len(word_pos.split(delimiter)) != 2:
+                #     print(line)
+                word, pos = word_pos.split(delimiter)
+                words.append(word)
+            out.write(' '.join(words) + '\n')
+
+
+def convert_zhuxian():
+    dataset = 'zx'
+    print('Converting corpus {}'.format(dataset))
+    root = 'data/' + dataset
+    make_sure_path_exists(root)
+    make_sure_path_exists(root + '/raw')
+    remove_pos('data/other/zx/dev.zhuxian.wordpos', 'data/zx/dev.txt', '_')
+    remove_pos('data/other/zx/train.zhuxian.wordpos', 'data/zx/train.txt', '_')
+    remove_pos('data/other/zx/test.zhuxian.wordpos', 'data/zx/test.txt', '_')
+
+    convert_file('data/zx/train.txt', 'data/{}/raw/train.txt'.format(dataset), True)
+    convert_file('data/zx/dev.txt', 'data/{}/raw/dev.txt'.format(dataset), True)
+    convert_file('data/zx/test.txt', 'data/{}/raw/test.txt'.format(dataset), False)
+    combine_files('data/{}/raw/train.txt'.format(dataset), 'data/{}/raw/dev.txt'.format(dataset),
+                  'data/{}/raw/train-all.txt'.format(dataset))
+    make_bmes(dataset)
+
+
+def convert_cncorpus():
+    dataset = 'cnc'
+    print('Converting corpus {}'.format(dataset))
+    root = 'data/' + dataset
+    make_sure_path_exists(root)
+    make_sure_path_exists(root + '/raw')
+    remove_pos('data/other/cnc/train.txt', 'data/cnc/train-no-pos.txt')
+    remove_pos('data/other/cnc/dev.txt', 'data/cnc/dev-no-pos.txt')
+    remove_pos('data/other/cnc/test.txt', 'data/cnc/test-no-pos.txt')
+
+    convert_file('data/cnc/train-no-pos.txt', 'data/{}/raw/train.txt'.format(dataset), True)
+    convert_file('data/cnc/dev-no-pos.txt', 'data/{}/raw/dev.txt'.format(dataset), True)
+    convert_file('data/cnc/test-no-pos.txt', 'data/{}/raw/test.txt'.format(dataset), False)
+    combine_files('data/{}/raw/train.txt'.format(dataset), 'data/{}/raw/dev.txt'.format(dataset),
+                  'data/{}/raw/train-all.txt'.format(dataset))
+    make_bmes(dataset)
+
+
+def extract_conll(src, out):
+    words = []
+    with open(src) as src, open(out, 'w') as out:
+        for line in src:
+            line = line.strip()
+            if len(line) == 0:
+                out.write(' '.join(words) + '\n')
+                words = []
+                continue
+            cells = line.split()
+            words.append(cells[1])
+
+
+def convert_conll(dataset):
+    print('Converting corpus {}'.format(dataset))
+    root = 'data/' + dataset
+    make_sure_path_exists(root)
+    make_sure_path_exists(root + '/raw')
+
+    extract_conll('data/other/{}/dev.conll'.format(dataset), 'data/{}/dev.txt'.format(dataset))
+    extract_conll('data/other/{}/test.conll'.format(dataset), 'data/{}/test.txt'.format(dataset))
+    extract_conll('data/other/{}/train.conll'.format(dataset), 'data/{}/train.txt'.format(dataset))
+
+    convert_file('data/{}/train.txt'.format(dataset), 'data/{}/raw/train.txt'.format(dataset), True)
+    convert_file('data/{}/dev.txt'.format(dataset), 'data/{}/raw/dev.txt'.format(dataset), True)
+    convert_file('data/{}/test.txt'.format(dataset), 'data/{}/raw/test.txt'.format(dataset), False)
