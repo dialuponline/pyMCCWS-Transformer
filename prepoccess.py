@@ -344,3 +344,18 @@ if __name__ == '__main__':
     print('Converting sighan2008 Simplified Chinese corpus')
     datasets = 'ctb', 'ckip', 'cityu', 'ncc', 'sxu'
     convert_all_sighan2008(datasets)
+
+    print('Combining those 8 sighan corpora to one joint corpus')
+    datasets = 'pku', 'msr', 'as', 'ctb', 'ckip', 'cityu', 'ncc', 'sxu'
+    make_joint_corpus(datasets, 'joint-sighan')
+    #print("mixed")
+    #make_mixed(datasets, 'joint-sighan')
+    #print("tradition")
+    #make_tra(datasets, 'joint-sighan')
+    print("simplify")
+    make_simp(datasets, 'joint-sighan')
+    
+    #make_bmes('joint-sighan')
+    #make_bmes('joint-sighan-mixed')
+    make_bmes('joint-sighan-simp')
+    #make_bmes('joint-sighan-tra')
