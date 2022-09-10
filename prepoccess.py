@@ -228,3 +228,119 @@ def convert_conll(dataset):
     convert_file('data/{}/train.txt'.format(dataset), 'data/{}/raw/train.txt'.format(dataset), True)
     convert_file('data/{}/dev.txt'.format(dataset), 'data/{}/raw/dev.txt'.format(dataset), True)
     convert_file('data/{}/test.txt'.format(dataset), 'data/{}/raw/test.txt'.format(dataset), False)
+    combine_files('data/{}/raw/train.txt'.format(dataset), 'data/{}/raw/dev.txt'.format(dataset),
+                  'data/{}/raw/train-all.txt'.format(dataset))
+    make_bmes(dataset)
+
+
+def make_joint_corpus(datasets, joint):
+    parts = ['dev', 'test', 'train', 'train-all']
+    for part in parts:
+        old_file = 'data/{}/raw/{}.txt'.format(joint, part)
+        if os.path.exists(old_file):
+            os.remove(old_file)
+        elif not os.path.exists(os.path.dirname(old_file)):
+            os.makedirs(os.path.dirname(old_file))
+        for name in datasets:
+            append_tags(name, joint, part)
+
+            
+def make_tra(datasets, joint):   
+    parts = ['dev', 'test', 'train', 'train-all']        
+    for part in parts:
+        old_file = 'data/{}-tra/raw/{}.txt'.format(joint, part)
+        if os.path.exists(old_file):
+            os.remove(old_file)
+        elif not os.path.exists(os.path.dirname(old_file)):
+            os.makedirs(os.path.dirname(old_file))
+        previous_file='data/{}/raw/{}.txt'.format(joint, part)
+        with open(previous_file,"r",encoding="utf-16") as src, open(old_file,"w",encoding="utf-16") as tgt:
+            lines=src.readlines()
+            i=0
+            for line in lines:               
+                fr=line.split(" ")[0][1:-1]
+                if fr not in ["ckip","cityu"]:
+                    new_sent=s2t.convert(line)
+                    tgt.write(new_sent.strip()+"\n")
+                    i+=1
+                    if i%10000==1:
+                        print(new_sent.strip(),line.strip())
+
+                else:
+                    tgt.write(line)  
+
+def make_simp(datasets, joint):   
+    parts = ['dev', 'test', 'train', 'train-all']        
+    for part in parts:
+        old_file = 'data/{}-simp/raw/{}.txt'.format(joint, part)
+        if os.path.exists(old_file):
+            os.remove(old_file)
+        elif not os.path.exists(os.path.dirname(old_file)):
+            os.makedirs(os.path.dirname(old_file))
+        previous_file='data/{}/raw/{}.txt'.format(joint, part)
+        with open(previous_file,"r",encoding="utf-16") as src, open(old_file,"w",encoding="utf-16") as tgt:
+            lines=src.readlines()
+            i=0
+            for line in lines:               
+                fr=line.split(" ")[0][1:-1]
+                if fr in ["ckip","cityu"]:
+                    new_sent=t2s.convert(line)
+                    tgt.write(new_sent.strip()+"\n")
+                    i+=1
+                    if i%10000==1:
+                        print(new_sent.strip(),line.strip())
+
+                else:
+                    tgt.write(line)  
+                    
+def make_mixed(datasets, joint):   
+    parts = ['dev', 'test', 'train', 'train-all']        
+    for part in parts:
+        old_file = 'data/{}-mixed/raw/{}.txt'.format(joint, part)
+        if os.path.exists(old_file):
+            os.remove(old_file)
+        elif not os.path.exists(os.path.dirname(old_file)):
+            os.makedirs(os.path.dirname(old_file))
+        previous_file='data/{}/raw/{}.txt'.format(joint, part)
+        with open(previous_file,"r",encoding="utf-16") as src, open(old_file,"w",encoding="utf-16") as tgt:
+            lines=src.readlines()
+            for i,line in tqdm(enumerate(lines)):
+                tgt.write(line)
+                fr=line.split(" ")[0][1:-1]
+                if "train-all" in part:
+                    if fr in ["ckip","cityu"]:
+                        new_sent=t2s.convert(line)
+                    else:
+                        new_sent=s2t.convert(line)
+                    tgt.write(new_sent.strip()+"\n")
+                    if (i+1)%10000==0:
+                        print(i,line.strip(),new_sent.strip())
+
+def convert_all_sighan2005(datasets):
+    for dataset in datasets:
+        print('Converting sighan bakeoff 2005 corpus: {}'.format(dataset))
+        convert_sighan2005_dataset(dataset)
+        make_bmes(dataset)
+
+
+def convert_all_sighan2008(datasets):
+    for dataset in datasets:
+        print('Converting sighan bakeoff 2008 corpus: {}'.format(dataset))
+        convert_sighan2008_dataset(dataset, 16)
+        make_bmes(dataset)
+
+
+if __name__ == '__main__':
+    print('Converting sighan2005 Simplified Chinese corpus')
+    datasets = 'pku', 'msr', 'as', 'cityu'
+    convert_all_sighan2005(datasets)
+    
+    print('Combining sighan2005 corpus to one joint Simplified Chinese corpus')
+    datasets = 'pku', 'msr', 'as', 'cityu'
+    make_joint_corpus(datasets, 'joint-sighan2005')
+    make_bmes('joint-sighan2005')
+
+    # For researchers who have access to sighan2008 corpus, use official corpora please.
+    print('Converting sighan2008 Simplified Chinese corpus')
+    datasets = 'ctb', 'ckip', 'cityu', 'ncc', 'sxu'
+    convert_all_sighan2008(datasets)
