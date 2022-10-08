@@ -43,4 +43,7 @@ class MultiHeadedAttention(nn.Module):
         
     def forward(self, query, key, value, mask=None):
         "Implements Figure 2"
-      
+        if mask is not None:
+            # Same mask applied to all h heads.
+            mask = mask.unsqueeze(1)
+           
