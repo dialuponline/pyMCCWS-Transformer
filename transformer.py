@@ -55,4 +55,6 @@ class MultiHeadedAttention(nn.Module):
              for l, x in zip(self.linears, (query, key, value))]
         
         # 2) Apply attention on all the projected vectors in batch. 
-        x, self.attn = 
+        x, self.attn = attention(query, key, value, mask=mask, 
+                                 dropout=self.dropout)
+       
