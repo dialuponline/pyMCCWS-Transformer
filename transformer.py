@@ -60,4 +60,8 @@ class MultiHeadedAttention(nn.Module):
         
         # 3) "Concat" using a view and apply a final linear. 
         x = x.transpose(1, 2).contiguous() \
-             .vi
+             .view(nbatches, -1, self.h * self.d_k)
+        return self.linears[-1](x)
+        
+class LayerNorm(nn.Module):
+    "Construct a
