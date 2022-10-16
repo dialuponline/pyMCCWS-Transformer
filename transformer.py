@@ -64,4 +64,7 @@ class MultiHeadedAttention(nn.Module):
         return self.linears[-1](x)
         
 class LayerNorm(nn.Module):
-    "Construct a
+    "Construct a layernorm module (See citation for details)."
+    def __init__(self, features, eps=1e-6):
+        super(LayerNorm, self).__init__()
+       
