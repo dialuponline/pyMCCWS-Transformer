@@ -116,4 +116,6 @@ class EncoderLayer(nn.Module):
         return self.sublayer[1](x, self.feed_forward)
         
 class Encoder(nn.Module):
-    "
+    "Core encoder is a stack of N layers"
+    def __init__(self, layer, N):
+        super(Encoder, self)._
