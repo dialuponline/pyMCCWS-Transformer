@@ -125,4 +125,7 @@ class Encoder(nn.Module):
     def forward(self, x, mask):
         #print(x.size(),mask.size())
         "Pass the input (and mask) through each layer in turn."
-      
+        mask=mask.byte().unsqueeze(-2)
+        for layer in self.layers:
+            x = layer(x, mask)
+        retur
