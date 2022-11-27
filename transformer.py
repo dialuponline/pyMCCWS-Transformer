@@ -132,4 +132,6 @@ class Encoder(nn.Module):
         
 def make_encoder(N=6, d_model=512, d_ff=2048, h=8, dropout=0.1):
     c = copy.deepcopy
-    attn = MultiHeadedAtt
+    attn = MultiHeadedAttention(h, d_model)
+    ff = PositionwiseFeedForward(d_model, d_ff, dropout)
+    return Encoder(EncoderLayer(d_model, c(attn), c
