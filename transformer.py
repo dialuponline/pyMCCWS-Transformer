@@ -128,4 +128,8 @@ class Encoder(nn.Module):
         mask=mask.byte().unsqueeze(-2)
         for layer in self.layers:
             x = layer(x, mask)
-        retur
+        return self.norm(x)
+        
+def make_encoder(N=6, d_model=512, d_ff=2048, h=8, dropout=0.1):
+    c = copy.deepcopy
+    attn = MultiHeadedAtt
