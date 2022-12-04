@@ -91,3 +91,72 @@ class CWS_OOV:
         ins=1.0*self.recall/self.tot
         if percentage:
             ins *= 100
+        return ins
+
+def get_processing_word(vocab_words=None, vocab_chars=None,
+                        lowercase=False, chars=False):
+
+    def f(word):
+        # 0. get chars of words
+        if vocab_chars is not None and chars == True:
+            char_ids = []
+            for char in word:
+                # ignore chars out of vocabulary
+                if char in vocab_chars:
+                    char_ids += [vocab_chars[char]]
+
+        # 1. preprocess word
+        if lowercase:
+            word = word.lower()
+        if word.isdigit():
+            word = '0'
+
+        # 2. get id of word
+        if vocab_words is not None:
+            if word in vocab_words:
+                word = vocab_words[word]
+            else:
+                word = vocab_words[UNK_TAG]
+
+        # 3. return tuple char ids, word id
+        if vocab_chars is not None and chars == True:
+            return char_ids, word
+        else:
+            return word
+
+    return f
+
+def append_tags(src, des, part,encode="utf-16"):
+    with open('data/{}/raw/{}.txt'.format(src, part),encoding=encode) as input, open('data/{}/raw/{}.txt'.format(des, part), 'a',encoding=encode) as output:
+        for line in input:
+            line = line.strip()
+            if len(line) > 0:
+                output.write('<{}> {} </{}>'.format(src, line, src))
+            output.write('\n')
+            
+def is_dataset_tag(word):
+    return len(word) > 2 and word[0] == '<' and word[-1] == '>'
+    
+def to_tag_strings(i2ts, tag_mapping, pos_separate_col=True):
+    senlen = len(tag_mapping)
+    key_value_strs = []
+
+    for j in range(senlen):
+        val = i2ts[tag_mapping[j]]
+        pos_str = val
+        key_value_strs.append(pos_str)
+    return key_value_strs
+
+def to_id_list(w2i):
+    i2w = [None] * len(w2i)
+    for w, i in w2i.items():
+        i2w[i] = w
+    return i2w
+    
+def make_sure_path_exists(path):
+    if len(path)==0: return 
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
